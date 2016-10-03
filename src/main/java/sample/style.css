@@ -1,0 +1,15 @@
+#pane{
+    -fx-background-image: url("../../resources/metall.jpg");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 3000 2098;
+    -fx-background-position: center center;
+    -fx-effect: dropshadow(three-pass-box, black, 30, 0.5, 0, 0);
+}
+#sound{
+    -fx-image: url("/sound.png");
+    -fx-image-size: 50 50;
+}
+#led{
+    -fx-image: url("../../resources/led.png");
+    -fx-image-size: 50 50;
+}
