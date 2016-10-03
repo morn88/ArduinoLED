@@ -47,16 +47,18 @@ public class Main extends Application {
         shadow_LED.setRadius(75);
 
         Image led = new Image("led.png");
-        Button btnOn = new Button("ВКЛ", new ImageView(led));
+        Button btnOn = new Button();
+        btnOn.setGraphic(new ImageView(led));
         btnOn.setShape(new Circle(30));
         btnOn.setPrefSize(150, 150);
 //        btnOn.setId("led");
 
+        Image sound = new Image("sound.png");
         ToggleButton tBtMus = new ToggleButton();
         tBtMus.setShape(new Circle(30));
         tBtMus.setPrefSize(150, 150);
         tBtMus.setStyle("-fx-base: lightblue");
-        tBtMus.setText("Звук");
+        tBtMus.setGraphic(new ImageView(sound));
 //        tBtMus.setId("sound");
 
         tBtMus.setOnAction(event -> {
@@ -77,7 +79,6 @@ public class Main extends Application {
         btnOn.setOnAction(event -> {
             portName.openPort();
             if (!ON) {
-                btnOn.setText("ВЫКЛ");
                 ON = true;
                 btnOn.setStyle("-fx-base: lightgreen");
                 btnOn.setEffect(shadow_LED);
@@ -85,7 +86,6 @@ public class Main extends Application {
                 portName.writeBytes(buff, 1);
                 System.out.println(buff[0]);
             } else {
-                btnOn.setText("ВКЛ");
                 ON = false;
                 btnOn.setStyle(null);
                 btnOn.setEffect(null);
