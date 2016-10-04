@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.effect.DropShadow;
@@ -17,16 +18,23 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     private boolean ON = false;
+    static SerialPort chosenPort;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-
-        SerialPort portName = SerialPort.getCommPort("COM3");
 
         VBox root = new VBox();
         root.setStyle("-fx-background-color: lightsteelblue");
 //        root.setId("pane");
 
+        ComboBox<String> portList = new ComboBox<>();
+        SerialPort[] portNames = SerialPort.getCommPorts();
+        for (SerialPort portName : portNames) {
+            portList.getItems().addAll(portName.getSystemPortName());
+        }
+
+        Button connect = new Button("Connect");
 
         Label label = new Label();
         label.setPrefSize(150,80);
@@ -51,6 +59,7 @@ public class Main extends Application {
         btnOn.setGraphic(new ImageView(led));
         btnOn.setShape(new Circle(30));
         btnOn.setPrefSize(150, 150);
+        btnOn.setDisable(true);
 //        btnOn.setId("led");
 
         Image sound = new Image("sound.png");
@@ -59,48 +68,66 @@ public class Main extends Application {
         tBtMus.setPrefSize(150, 150);
         tBtMus.setStyle("-fx-base: lightblue");
         tBtMus.setGraphic(new ImageView(sound));
+        tBtMus.setDisable(true);
 //        tBtMus.setId("sound");
+
+        connect.setOnAction(event -> {
+            if (connect.getText().equals("Connect")) {
+                chosenPort = SerialPort.getCommPort(portList.getValue());
+                if (chosenPort.openPort()) {
+                    connect.setText("Disconnect");
+                    portList.setDisable(true);
+                    btnOn.setDisable(false);
+                    tBtMus.setDisable(false);
+                }
+            } else {
+                chosenPort.closePort();
+                portList.setDisable(false);
+                connect.setText("Connect");
+                btnOn.setDisable(true);
+                tBtMus.setDisable(true);
+            }
+
+        });
 
         tBtMus.setOnAction(event -> {
             if(tBtMus.isSelected()){
                 tBtMus.setEffect(shadow_mus);
-                portName.openPort();
                 byte[] buff = {50};
-                portName.writeBytes(buff, 1);
+                chosenPort.writeBytes(buff, 1);
             }
             else {
                 tBtMus.setEffect(null);
-                portName.openPort();
                 byte[] buff = {51};
-                portName.writeBytes(buff, 1);
+                chosenPort.writeBytes(buff, 1);
             }
         });
 
         btnOn.setOnAction(event -> {
-            portName.openPort();
             if (!ON) {
                 ON = true;
                 btnOn.setStyle("-fx-base: lightgreen");
                 btnOn.setEffect(shadow_LED);
                 byte[] buff = {'1'};
-                portName.writeBytes(buff, 1);
+                chosenPort.writeBytes(buff, 1);
                 System.out.println(buff[0]);
             } else {
                 ON = false;
                 btnOn.setStyle(null);
                 btnOn.setEffect(null);
                 byte[] buff = {'0'};
-                portName.writeBytes(buff, 1);
+                chosenPort.writeBytes(buff, 1);
                 System.out.println(buff[0]);
             }
         });
 
 
         root.setAlignment(Pos.CENTER);
+        root.setSpacing(10);
 
-        root.getChildren().addAll(btnOn, label, tBtMus, label_sound);
+        root.getChildren().addAll(portList, connect, btnOn, label, tBtMus, label_sound);
         primaryStage.setTitle("Hello World");
-        Scene scene = new Scene(root, 400, 550);
+        Scene scene = new Scene(root, 400, 600);
 //        scene.getStylesheets().addAll(this.getClass().getResource("sample/style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
