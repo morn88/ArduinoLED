@@ -81,6 +81,8 @@ public class Main extends Application {
                     tBtMus.setDisable(false);
                 }
             } else {
+                byte[] buff = {52};
+                chosenPort.writeBytes(buff, 1);
                 chosenPort.closePort();
                 portList.setDisable(false);
                 connect.setText("Connect");
@@ -110,14 +112,12 @@ public class Main extends Application {
                 btnOn.setEffect(shadow_LED);
                 byte[] buff = {'1'};
                 chosenPort.writeBytes(buff, 1);
-                System.out.println(buff[0]);
             } else {
                 ON = false;
                 btnOn.setStyle(null);
                 btnOn.setEffect(null);
                 byte[] buff = {'0'};
                 chosenPort.writeBytes(buff, 1);
-                System.out.println(buff[0]);
             }
         });
 
